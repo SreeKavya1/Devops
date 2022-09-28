@@ -1,34 +1,3 @@
 # Devops-Class
 
-Tools Covered 
-    
-    
-    
-    1. Git 
-    
-    
-    2. Git Hub 
-    
-    
-    3. Jenkins 
-    
-    
-    4. Ansible 
-    
-    
-    5. Terraform 
-    
-    
-    6. Docker 
-    
-    
-    7. Kubernetes 
-    
-    
-    8. Monitoring Tool like Splunk 
-    
-    
-    9. Lab Set Up @ AWS 
-    
-    
-    10. Interview Questions
+<img width="820" alt="image" src="https://user-images.githubusercontent.com/95061534/192830255-25c22ab2-aab4-4af6-a4c6-54d279407630.png">
