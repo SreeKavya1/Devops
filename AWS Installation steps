@@ -1,3 +1,11 @@
+sudo amazon-linux-extras list | grep ansible2
+sudo amazon-linux-extras enable ansible2
+sudo yum install -y ansible
+
+==========================
+
+
+
 Install Ansible on AWS EC2 Amazon Linux 2 instance
 Step 1. Update system packages.
 
