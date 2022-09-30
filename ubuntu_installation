@@ -1,0 +1,8 @@
+sudo apt-get install ansible -y
+
+The installation will pick up a large number of dependencies and will take anywhere from 2-10 minutes to complete.
+
+We’ll also need to install a second piece of software, called SSHpass, which is a non-interactive password provider — otherwise you’d have trouble with SSH authentication. Install SSHPass with:
+
+sudo apt-get install sshpass -y
+
