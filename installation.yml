@@ -1,0 +1,13 @@
+---
+- hosts:  localhost
+  tasks:
+    - name: Install dependency packages with apt-get
+      yum:
+        name:
+          - gcc
+          - gcc-c++
+          - git
+          - mariadb-devel
+          - cloud-utils-growpart
+          - postgresql-devel
+        state:  present
