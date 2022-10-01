@@ -21,3 +21,11 @@
         packages:
           - jenkins
           - java-devel
+    - name: Ensure systemd daemon reloaded
+      command: systemctl daemon-reload
+    - name: Ensure Jenkins service is enabled and started
+      service:
+        name: jenkins
+        state: started
+    
+    
