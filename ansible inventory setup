@@ -1,0 +1,40 @@
+step-1
+provising the ec2-instance
+
+
+step-2
+innstall ansible
+sudo amazon-linux-extras list | grep ansible2
+sudo amazon-linux-extras enable ansible2
+sudo yum install -y ansible
+
+
+step-3
+create a inventory file
+ cd ./  enter
+ vim inventory
+ paste the inventory configuration
+   
+   
+step-4
+ create a ansible.cfg
+ nano ansible.cfg
+ 
+ 
+[defaults]
+inventory = ./inventory
+remote_user = ec2-user
+===================================================
+step-5
+
+
+ansible all --list-hosts
+
+
+ansible-inventory -i inventory --graph
+
+
+ansible all -m ping
+========================
+step-6
+copy .pub ssh master keys  to managed nodes authorized keys
