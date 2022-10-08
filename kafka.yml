@@ -1,0 +1,137 @@
+- name: Installing Kafka on Ubuntu
+  hosts: testserver
+  vars: 
+    - installation_dir : /opt/kafka
+  tasks:
+    - name: Install JRE after apt update
+      become: yes
+      apt:
+        name: 
+          - default-jre
+        state: present
+        update_cache: yes
+
+    - name: Create a group 
+      become: yes
+      group:
+        name: kafka
+        state: present
+
+    - name: Create an user 
+      become: yes
+      user:
+        name: kafka
+        state: present
+        group: kafka
+
+    - name: Create a Directory /opt/kafka
+      become: yes
+      file:
+        path: "{{installation_dir}}"
+        state: directory
+        mode: 0755
+        owner: kafka
+        group: kafka
+
+    - name: Download Kafka and Unzip 
+      become: yes
+      become_user: kafka
+      unarchive:
+        src: https://dlcdn.apache.org/kafka/3.1.0/kafka_2.13-3.1.0.tgz
+        dest: "{{installation_dir}}"
+        mode: 0755
+        remote_src: yes
+
+    - name: Move all the files to parent Directory
+      become: yes
+      become_user: kafka
+      shell:
+        mv {{installation_dir}}/kafka_*/* {{installation_dir}}/.
+
+    - name: Update the log path
+      become: yes
+      become_user: kafka
+      replace:
+        path: "{{installation_dir}}/config/server.properties"
+        regexp: 'log.dirs=(.+)'
+        replace: 'log.dirs={{installation_dir}}/logs'
+        backup: yes
+
+    - name: Update the Java Heap Size for Kafka
+      become: yes
+      become_user: kafka
+      replace:
+        path: "{{installation_dir}}/bin/kafka-server-start.sh"
+        regexp: 'export KAFKA_HEAP_OPTS=(".+")'
+        replace: 'export KAFKA_HEAP_OPTS="-Xmx520M -Xms520M"'
+        backup: yes
+    
+
+    - name: Create a Service file for ZooKeeper with Copy module
+      become: yes
+      copy:
+        dest: /etc/systemd/system/zookeeper.service
+        content: |
+          [Unit]
+          Requires=network.target remote-fs.target
+          After=network.target remote-fs.target
+
+          [Service]
+          Type=simple
+          User=kafka
+          ExecStart={{installation_dir}}/bin/zookeeper-server-start.sh {{installation_dir}}/config/zookeeper.properties
+          ExecStop={{installation_dir}}/bin/zookeeper-server-stop.sh
+          Restart=on-abnormal
+
+          [Install]
+          WantedBy=multi-user.target
+        mode: 0755
+      
+    - name: Create a Service file for Kafka with Copy module
+      become: yes
+      copy:
+        dest: /etc/systemd/system/kafka.service
+        content: |
+          [Unit]
+          Requires=zookeeper.service
+          After=zookeeper.service
+
+          [Service]
+          Type=simple
+          User=kafka
+          ExecStart=/bin/sh -c '{{installation_dir}}/bin/kafka-server-start.sh {{installation_dir}}/config/server.properties > {{installation_dir}}/kafkaservice.log 2>&1'
+          ExecStop={{installation_dir}}/bin/kafka-server-stop.sh
+          Restart=on-abnormal
+
+          [Install]
+          WantedBy=multi-user.target
+        mode: 0755
+
+    - name: Start Services
+      tags: startservices
+      become: yes
+      systemd:
+        name: '{{item}}'
+        state: started
+        enabled: yes
+      with_items:
+        - "kafka"
+        - "zookeeper"
+    
+    - name: Validating if zookeeper is up and listening on port 2181
+      wait_for:
+        host: localhost
+        port: 2181
+        delay: 10
+        timeout: 30
+        state: started
+        msg: "Zookeeper not seem to be running"
+
+    - name: Validating if Kafka is up and listening on port 2181
+      wait_for:
+        host: localhost
+        port: 9092
+        delay: 10
+        timeout: 30
+        state: started
+        msg: "Zookeeper not seem to be running"
