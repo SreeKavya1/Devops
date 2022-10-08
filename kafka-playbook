@@ -1,0 +1,11 @@
+list of tasks the playbook is designed to do
+
+Perform apt update
+Install JRE needed for Kafka and Zookeeper
+Create a User and Group for Kafka
+Create a directory to install Kafka
+Download Kafka and Unarchive
+Update the Log Path
+Update the Heap Size of the Kafka
+Create a Service – systemctl file for Kafka and Zookeeper
+Enabling the Service for Stratup
