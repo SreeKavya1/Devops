@@ -1,0 +1,214 @@
+Jenkins also has the capability of distributing build jobs across a large number of systems, which is known as Jenkins distributed builds. We can set up a farm of build servers using Jenkins to distribute the burden or perform the build jobs in different settings.
+
+When we have a large project to build and the load has to be distributed across several machines on the network, distributed builds improve the efficiency of the build process. Jenkins implements the Master/Slave architecture to manage distributed builds.
+
+We may associate a project with the slave node and then schedule it for the build when we've created and configured it.
+
+No alt text provided for this image
+Jenkins Master is the primary Jenkins server and is responsible for the following tasks:
+
+It distributes the builds among the numerous slaves for execution.
+It organises the build projects.
+It keeps an eye on the slaves at all times.
+Master can also run build jobs directly if necessary.
+It keeps track of the build outcomes and shows them.
+Jenkins Slave runs on a remote machine. A slave is responsible for the following tasks:
+
+Slaves can be operated on a number of different operating systems.
+It responds to the Jenkins Master's demands.
+Apart from the fact that Jenkins executes the build task on the next available save, 
+we can always arrange the project to run on a certain sort of slave computer.
+It also completes construction operations that the Master has dispatched.
+Steps -
+
+1. Install Java on master node
+
+2. Install Jenkins on master node
+
+3. Install java on slave node
+
+4. Create a user and ssh keys on slave node
+
+5. Copy keys on master node
+
+6. Join slave node to master
+
+7. Test the setup
+
+Procedure -
+
+1. Install java on master node
+
+[root@jenkins-master ~]# dnf install java-11-openjdk -y
+
+2. Install jenkins on master node
+
+[root@jenkins-master ~]# dnf install wget -y
+
+
+[root@jenkins-master ~]# wget -O /etc/yum.repos.d/jenkins.repo  https://pkg.jenkins.io/redhat-stable/jenkins.repo
+
+
+[root@jenkins-master ~]# rpm --import https://pkg.jenkins.io/redhat-stable/jenkins.io.key
+
+
+[root@jenkins-master ~]# dnf install jenkins -y
+
+
+[root@jenkins-master ~]# systemctl status jenkins
+
+
+[root@jenkins-master ~]# systemctl enable --now  jenkins
+
+
+[root@jenkins-master ~]# systemctl status jenkins
+
+
+[root@jenkins-master ~]# firewall-cmd --permanent --add-port=8080/tcp
+
+
+[root@jenkins-master ~]# firewall-cmd --reload
+
+Access URL http://192.168.0.103:8080
+We will be asked to enter the password, like below -
+
+No alt text provided for this image
+When prompted get the password from below location and enter it -
+
+[root@jenkins-master ~]# cat /var/lib/jenkins/secrets/initialAdminPassword
+
+8913aa206f044edb83ca0ddf52cbe085
+
+Install the select the suggested plugins
+On next screen you can see its asking to install the suggested plugins -
+
+No alt text provided for this image
+No alt text provided for this image
+On next screen you will be prompted to create Jenkins user -
+
+No alt text provided for this image
+No alt text provided for this image
+Installation is completed
+
+No alt text provided for this image
+We get default Jenkins Dashboard
+
+No alt text provided for this image
+3. Install java on slave node
+
+[root@jenkins-slave1 ~]# dnf install java-11-openjdk -y
+
+4. Create a user and ssh keys on slave node
+
+[root@jenkins-slave1 ~]# useradd prayag
+
+Generate ssh-key for user prayag and note down private key - to be added in Jenkins credentials -
+
+[prayag@jenkins-slave ~]$ ssh-keygen -t rsa
+
+[prayag@jenkins-slave ~]$ cd .ssh/
+
+[prayag@jenkins-slave ~]$ cat id_rsa.pub > authorized_keys
+
+[prayag@jenkins-slave ~]$ chmod 700 authorized_keys
+
+[prayag@jenkins-slave ~]$ cat authorized_keys
+---
+
+5. Copy keys on master node
+
+On master - copy public key in /var/lib/jenkins/.ssh/known_hosts - used when selecting option Know hosts key strategy
+
+[root@jenkins-master ~]# mkdir /var/lib/jenkins/.ss
+
+[root@jenkins-master ~]# chown jenkins:jenkins /var/lib/jenkins/.ssh
+
+[root@jenkins-master ~]# echo "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC2djObC0ahzBSVDKy82N4G/+orCAqwspGcPBZne0HL1f9S3ZJxZm+UJtCbbL0MjeXmJOJ3y1qRxn5f2e9+RLXADT7RDiGU1DOp3ZEqjETPHHZrM3fJEeu/kada7ivUoj3o82Uid7cBeAUtEUJ2L4uWPjdskjtOVi6AIpe/XTHr+uQ6zprqZovpeRJjJNeDyT4hXzH0587kCPyYxVSGkz5n2+/c2WV8QTrSiEb9fENiOE231AoRc38uN1f/eoernJ6lqO8PFLoOTp0qhcmOLa3Op1OJqikNa09yIfLZ1/CzAjJC8p19YiWei50ypmm0zcNrmxdtguOU1hKS0ie0UGLXpMhbsBI2YA6dXosTqCzQzB9PmOa+nLrwu6iFE34PN5UsvnmqQvhAWVsNLFzg+Uqok8fSd6pqxgvgNmYU4TSQJa+/K09DCj+xdAszOvWyuGRs6D3oSogvH0cjPa5qqXoMSecK/81NU44i37Mj6/cY5Q2AHj/LFKJEbvST9dSoPmU= prayag@jenkins-slave.example.com" > /var/lib/jenkins/.ssh/known_hosts
+
+[root@jenkins-master ~]# cat /var/lib/jenkins/.ssh/known_hosts
+
+ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC2djObC0ahzBSVDKy82N4G/+orCAqwspGcPBZne0HL1f9S3ZJxZm+UJtCbbL0MjeXmJOJ3y1qRxn5f2e9+RLXADT7RDiGU1DOp3ZEqjETPHHZrM3fJEeu/kada7ivUoj3o82Uid7cBeAUtEUJ2L4uWPjdskjtOVi6AIpe/XTHr+uQ6zprqZovpeRJjJNeDyT4hXzH0587kCPyYxVSGkz5n2+/c2WV8QTrSiEb9fENiOE231AoRc38uN1f/eoernJ6lqO8PFLoOTp0qhcmOLa3Op1OJqikNa09yIfLZ1/CzAjJC8p19YiWei50ypmm0zcNrmxdtguOU1hKS0ie0UGLXpMhbsBI2YA6dXosTqCzQzB9PmOa+nLrwu6iFE34PN5UsvnmqQvhAWVsNLFzg+Uqok8fSd6pqxgvgNmYU4TSQJa+/K09DCj+xdAszOvWyuGRs6D3oSogvH0cjPa5qqXoMSecK/81NU44i37Mj6/cY5Q2AHj/LFKJEbvST9dSoPmU= prayag@jenkins-slave.example.com
+
+[root@jenkins-master ~]# ssh-keyscan -H jenkins-slave.example.com >>/var/lib/jenkins/.ssh/known_hostsh
+---
+
+6. Join slave node to master
+
+To join the Jenkins slave node to Jenkins Master, perform below steps -
+
+Select Build Executor Status > New Node > Type - Permanent 
+
+Select below values -
+
+Name - jenkins-slave1
+
+Description - jenkins-slave1
+
+Number of executors - 1 
+
+Remote root directory - /home/prayag
+
+Labels - jenkins-slave1
+
+Usage - Use this mode as much as possible
+
+Launch method - Launch agents via SSH
+
+Host - 192.168.0.103
+
+Credentials - use ssh username / private key options
+
+Host Key Verification Strategy - Know hosts key strategy
+
+Save and check that new slave node is added and is in sync
+
+When prompted give node name
+
+No alt text provided for this image
+Select Permanent Agent
+
+No alt text provided for this image
+Create ssh credentials with Private key -
+
+No alt text provided for this image
+Enter node name and select Permanent Agent
+
+No alt text provided for this image
+We can see Jenkins Slave is launching ..
+
+Agent status - "is being launched"
+
+No alt text provided for this image
+Jenkins Slave node is now is "In Sync"
+
+No alt text provided for this image
+7. Test Jenkins Jobs -
+
+Create "new item"
+Enter an item name – Job1
+Chose Freestyle project
+
+Under General Section
+Choose Restrict where this project can be run
+
+Update your jenkins slave label jenkins-slave1
+
+Under Build section Execute shell
+ #!/bin/bash
+ echo "Testing Jenkins Master Slave Setup"
+
+Save your job
+Build job
+Check "console output"
+Create new item and in General tab - select "Restrict where this project can be run"
+
+No alt text provided for this image
+Select Build as "Execute shell" and run echo command - "Testing Jenkins Master Slave Setup"
+
+No alt text provided for this image
+Save and run build - "Build Now"
+
+Once the build is completed we can check the console output - "Building remotely jenkins-slave1" in workspace....
+
+No alt text provided for this image
+I hope you found this article to be useful in some way. I'll be back with some more interesting new articles on DEVOPS tools.
