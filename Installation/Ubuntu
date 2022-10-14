@@ -1,0 +1,84 @@
+Step 1: Log in to the server and update the package list.
+
+sudo apt-get -y update
+
+
+
+Step 2: Jenkins needs the Java runtime as it is based on Java. Install open JDK 11 package using the following command.
+
+sudo apt install openjdk-11-jdk -y
+
+
+
+Step 3: Add the Jenkins Debian repo.
+
+wget -q -O - https://pkg.jenkins.io/debian/jenkins.io.key | sudo apt-key add -
+sudo sh -c 'echo deb https://pkg.jenkins.io/debian-stable binary/ > \
+    /etc/apt/sources.list.d/jenkins.list'
+
+
+
+Step 4: Update the package list again.
+
+sudo apt-get update -y
+
+
+
+Step 5: Install the latest LTS Jenkins.
+
+Note: You can check the official Jenkins ubuntu package repo for more information on the latest versions
+
+sudo apt-get install jenkins -y
+
+
+
+Step 6: Start the Jenkins service & enable it for starting during bootup.
+
+sudo systemctl start jenkins
+sudo systemctl enable jenkins
+You can check the status of the Jenkins service using the following command.
+
+sudo systemctl status jenkins
+
+
+
+Step 7: Now you will be able to access the Jenkins server on port 8080 using the IP address as shown below.
+
+Note: You can also run Jenkins on port 80. Check this Jenkins guide to change access port
+
+jenkins unlock admin password on Ubuntu
+
+
+
+Step 8: As you can see in the above image, you need to provide the administrative password. You can get the password using the following command.
+
+ sudo cat /var/lib/jenkins/secrets/initialAdminPassword
+Copy the password and click continue.
+
+
+
+Step 9: Next, you will be asked to configure plugins as shown below. Select the “Install Suggested Plugins” option. This will install all the required plugins for building your projects. It will take a few minutes to install the plugins.
+
+install suggested Jenkins plugins on ubuntu
+
+
+
+Step 10: Once installed, You need to create a user with a password and click “save and finish”
+
+
+Click “Start Using Jenkins” and it will take you to the Jenkins Dashboard. Log in using the username and password that you have given in step 8.
+
+That’s it! Now you have a fully functional Jenkins server up and running. Consider setting up Jenkins backup using the backup plugin.
+
+========================================
+HOW TO CHECK JENKINS INSTALLATION 
+========================================
+
+
+How do I know if Jenkins is installed in Ubuntu?
+You can check if Jenkins is installed in Ubuntu by executing the command apt-cache policy jenkins
+
+Also, you can list the installed Jenkins package using dpkg -l | grep jenkins
+
+
+Thank You 
